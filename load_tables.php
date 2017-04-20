@@ -63,7 +63,7 @@ function nensa_display_jn_rankings_table( $datatables_id ) {
 	if(isset($_POST['gender'])){
 		$season = $_POST['season'];
 		$gender = $_POST['gender'];
-		$shortcode = '[wpdatatable id='.$datatables_id.' VAR1="'.$gender.'" table_view=regular]';
+		$shortcode = '[wpdatatable id='.$datatables_id.' VAR1="'.$season.'" VAR2="'.$gender.'" table_view=regular]';
     echo "</br><hr>";
     echo do_shortcode($shortcode); 
 	}
@@ -101,11 +101,12 @@ function nensa_display_event_results_table( $datatables_id ) {
 	if (!isset($datatables_id) || $datatables_id == 0) { return; }
 
 	if ( !isset( $results_db ) ) {
-		$results_db = new PDO('mysql:host='.DB_HOST.';dbname='.DB_NAME_RESULTS, DB_USER, DB_PASSWORD);
+				$results_db = new PDO('mysql:host='.RESULTS_DB_HOST.';dbname='.RESULTS_DB_NAME, RESULTS_DB_USER, RESULTS_DB_PASSWORD);
+
 	}
 
 	if ( !isset( $results_db ) ) { echo "DB not available"; }
-		$quer2="SELECT DISTINCT season FROM race_event order by season"; 
+		$quer2="SELECT DISTINCT season FROM race_event where season > 2016 order by season desc"; 
 	if (array_key_exists("season",$_GET)) {
 		$season = $_GET['season'];
 	} 
