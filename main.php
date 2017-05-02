@@ -15,29 +15,6 @@ include ("neon_fetch.php");
 include ("neon_retrieve.php");
 include ("create_event.php");
 
-/*
-add_action( 'admin_enqueue_scripts', 'my_enqueue' );
-function my_enqueue($hook) {
-	if (!strpos($hook, 'nensa_admin') !== false) {
-	  	return;
-	} 
-        
-	wp_enqueue_script( 'ajax-script', plugins_url( '/js/nensa_ajax.js', __FILE__ ), array('jquery') );
-
-	// in JavaScript, object properties are accessed as ajax_object.ajax_url, ajax_object.we_value
-	wp_localize_script( 'ajax-script', 'ajax_object',
-  array( 'ajax_url' => admin_url( 'admin-ajax.php' ), 'season' => 2015 ) );
-}
-
-// Same handler function...
-add_action( 'wp_ajax_jn_select', 'jn_select_callback' );
-function jn_select_callback() {
-	global $wpdb;
-	$season = intval( $_POST['season'] );
-  echo $season;
-	wp_die();
-}
-*/
 class nensa_admin {
 
 	// Setup options variables
@@ -97,23 +74,8 @@ class nensa_admin {
 	
 	public function nensa_admin_validate($input) {
 		$valid = array();
-		/*
-		$valid['jq_theme'] = sanitize_text_field($input['jq_theme']);
-		if (strlen($valid['jq_theme']) == 0) {
-			add_settings_error(
-					'jq_theme',                      // Setting title
-					'jq_theme_texterror',            // Error ID
-					'Please select a jQuery theme.', // Error message
-					'error'                          // Type of message
-			);
-	
-			// Set it to the default value
-			$valid['jq_theme'] = $this->data['jq_theme'];
-		}
-		*/
 		$valid['jq_theme'] = $input['jq_theme'];
-
-    	return $valid;
+		return $valid;
 	}
 	
 	public function nensa_admin_admin_scripts() {
@@ -138,7 +100,7 @@ class nensa_admin {
 		$select_theme = isset($options['jq_theme']) ? $options['jq_theme'] : 'smoothness';
 		?><link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/<?php echo $select_theme; ?>/jquery-ui.css"><?php  // For jquery ui styling - Direct from jquery
 	}
-	
+
 	public function nensa_admin_menu_page() {
 
 	  if(!current_user_can('manage_options')){
@@ -217,6 +179,26 @@ class nensa_admin {
 							<table class="form-table"> 
 					      <tr valign="top"><th scope="row"><?php _e('Select Season:','nensa_admin'); ?></th>
 					        <td>
+						          <select name="import_season" id="import_season" value=2017 >
+						          	<option value=2020>2020</option>
+						          	<option value=2019>2019</option>
+						          	<option value=2018>2018</option>
+						            <option value=2017>2017</option>
+						            <option value=2016>2016</option>
+						            <option value=2015>2015</option>
+						            <option value=2014>2014</option>
+						          </select>
+								  </td>
+								</tr>
+								<tr>
+									<td>
+										<select id="event_select_test" name="event_select_test" value="">
+											<option name="" value=""></option>
+										</select>
+									</td>
+								</tr>
+								<tr valign="top"><th scope="row"><?php _e('Select Event:','nensa_admin'); ?></th>
+					        <td>
 								    <select id="event_select" name="event_select" value="">
 								        <option name="" value=""></option>
 								        
@@ -246,7 +228,58 @@ class nensa_admin {
 					  </form>
           </div> <!-- End tab 2 -->
           <div id="tabs-3">
-        		<?php	 create_event(); ?>
+        		 <h1>Add Event</h1>
+						  </br>
+						  <form action=# method="POST" style="background-color: GAINSBORO;">
+						    <table class="form-table"> 
+						      <tr valign="top" name="Season"><th><?php _e('Select Season:','nensa_admin'); ?></th>
+						        <td>
+						          <select name="season" id="season" value=2017 >
+						            <option value=2017>2017</option>
+						            <option value=2016>2016</option>
+						            <option value=2015>2015</option>
+						            <option value=2014>2014</option>
+						          </select>
+						        </td>
+						      </tr>
+						      <tr valign="top"><th scope="row"><?php _e('Enter Event Name:','nensa_admin'); ?></th>
+						        <td>
+						          <input name="event_name" id="event_name" type="text">
+						        </td>
+						      </tr>
+						      <tr valign="top"><th scope="row"><?php _e('Select Date:','nensa_admin'); ?></th>
+						        <td>
+						          <input type="date" id="event_date" name="event_date" max="2020-12-31"><br>
+						        </td>
+						      </tr>
+						      <tr valign="top"><th scope="row"><?php _e('Enter Venue Name:','nensa_admin'); ?></th>
+						        <td>
+						          <input name="event_venue" id="event_venue" type="text">
+						        </td>
+						      </tr> 
+						      <tr valign="top"><th scope="row"><?php _e('Enter State:','nensa_admin'); ?></th>
+						        <td>
+						          <select name="event_state" id="event_state" value="NH">
+						            <option value="NH">MA</option>
+						            <option value="MA">NH</option>
+						            <option value="ME">ME</option>
+						            <option value="VT">VT</option>
+						            <option value="NY">NY</option>
+						          </select>
+						        </td>
+						      </tr> 
+						      <tr valign="top"><th scope="row"><?php _e('Enter Host Name:','nensa_admin'); ?></th>
+						        <td>
+						          <input name="event_host" id="event_host" type="text">
+						        </td>
+						      </tr>                                              
+						    </table>
+						      <p class="submit" style="padding-left: 12px;">
+						        <input id="event_button" type="submit" name="submit" class="button-primary" value="<?php _e('Create New Event', 'nensa_admin') ?>" />
+						      </p>
+						  </form>
+						  </br>
+						 <hr>
           </div> <!-- End tab 3 -->
           <div id="tabs-4">
         		<?php	 create_race(); ?>
@@ -288,4 +321,29 @@ function nensa_admin_plugin_action_links( $links, $file ) {
 add_action('plugins_loaded', 'nensa_admin_lang_init');
 function nensa_admin_lang_init() {
 	load_plugin_textdomain( 'nensa_admin', false, dirname( plugin_basename( __FILE__ ) ) . '/languages/' );
+}
+
+
+add_action('wp_ajax_season_select','season_select');
+function season_select() {
+	global $wpdb1;
+	if(isset($_POST["action"]) && $_POST["action"] == 'season_select') {
+		$event_season = $_POST["season"];
+	} else {
+		wp_die();
+	}
+	
+	$season = "";
+	$sql = "SELECT  event_name  FROM RACE_EVENT WHERE season='$event_season' AND parent_event_id<>0;";
+	$results = $wpdb1->get_results($sql);
+	foreach($results as $index => $value) {
+		foreach($value as $eventName) {
+			$season = $season.",".$eventName;
+		}
+	}
+
+	$response = json_encode( array( 'season' => $season ) );
+  header( "Content-Type: application/json" );
+  echo $response;
+	wp_die();
 }

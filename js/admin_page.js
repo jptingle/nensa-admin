@@ -151,4 +151,49 @@ jQuery(document).ready(function($) {
 
 	});
 
+
+	$('#import_season').change(function() { 
+		import_season = $( "#import_season" ).val();
+
+				// Setup ajax variable
+		var data = {
+			action: 'season_select',
+			season: import_season
+		};
+
+		// Run ajax request
+		$.post(nensa_admin_pass_js_vars.ajaxurl, data, function(response) {
+			var obj = response.season.split(",");
+			//			var theString = response.season;
+			//$('#event_select_test option:gt(0)').remove();
+			//$.each(theString.split(",").slice(0,-1), function (index, value) {
+
+
+			var buildings = $.makeArray( obj );
+			$('#event_select_test option:gt(0)').remove();
+			$.each(buildings, function (index, value) {
+			    $('#event_select_test').append($('<option/>', { 
+			        value: value,
+			        text : value 
+			    }));
+			}); 
+			//$('#event_select_test').append(response.html_string);
+		});
+	});
+
+	$('#event_button').click(function() { 
+		import_season = $( "#import_season" ).val();
+
+				// Setup ajax variable
+		var data = {
+			action: 'fetch_member_data',
+			import_season: import_season
+		};
+
+		// Run ajax request
+		//$.post(nensa_admin_pass_js_vars.ajaxurl, data, function(response) {
+			
+		//});
+	});
+
 });
