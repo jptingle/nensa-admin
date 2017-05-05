@@ -190,20 +190,20 @@ class nensa_admin {
 						          </select>
 								  </td>
 								</tr>
-								<tr>
+								<tr valign="top"><th scope="row"><?php _e('Select Event:','nensa_admin'); ?></th>>
 									<td>
-										<select id="event_select_test" name="event_select_test" value="">
+										<select id="load_results_event_select" name="load_results_event_select" value="">
 											<option name="" value=""></option>
 										</select>
 									</td>
 								</tr>
-								<tr valign="top"><th scope="row"><?php _e('Select Event:','nensa_admin'); ?></th>
+								<tr valign="top"><th scope="row"><?php _e('Select Race:','nensa_admin'); ?></th>
 					        <td>
 								    <select id="event_select" name="event_select" value="">
 								        <option name="" value=""></option>
 								        
 								        <?php  // Get all db table names
-								        $sql = "SELECT  event_name  FROM RACE_EVENT WHERE season=2017 AND parent_event_id<>0;";
+								        $sql = "SELECT  event_name  FROM RACE_EVENT WHERE season=2017 AND parent_event_id is null;";
 								        $results = $wpdb1->get_results($sql);
 								        $repop_table = isset($_POST['event_select']) ? $_POST['event_select'] : null;
 								        
@@ -334,7 +334,7 @@ function season_select() {
 	}
 	
 	$season = "";
-	$sql = "SELECT  event_name  FROM RACE_EVENT WHERE season='$event_season' AND parent_event_id<>0;";
+	$sql = "SELECT  event_name  FROM RACE_EVENT WHERE season='$event_season' AND parent_event_id is null;";
 	$results = $wpdb1->get_results($sql);
 	foreach($results as $index => $value) {
 		foreach($value as $eventName) {

@@ -164,20 +164,15 @@ jQuery(document).ready(function($) {
 		// Run ajax request
 		$.post(nensa_admin_pass_js_vars.ajaxurl, data, function(response) {
 			var obj = response.season.split(",");
-			//			var theString = response.season;
-			//$('#event_select_test option:gt(0)').remove();
-			//$.each(theString.split(",").slice(0,-1), function (index, value) {
-
-
-			var buildings = $.makeArray( obj );
-			$('#event_select_test option:gt(0)').remove();
-			$.each(buildings, function (index, value) {
-			    $('#event_select_test').append($('<option/>', { 
+			var event_list = $.makeArray( obj );
+			$('#load_results_event_select option:gt(0)').remove();
+			$.each(event_list, function (index, value) {
+			    $('#load_results_event_select').append($('<option/>', { 
 			        value: value,
 			        text : value 
 			    }));
 			}); 
-			//$('#event_select_test').append(response.html_string);
+
 		});
 	});
 
