@@ -223,14 +223,19 @@ function fetch_member_data() {
       // While the form variable "reload" is set to true when checked, the valuation below
       // can be done as binary.  When not checked, it is not set so continue with the 
       // fetch by changes after the last pull
+      // 2012-08-01
       if(isset($_POST["reload"]) && $_POST["reload"] == 'false' && isset($member_skier_date) && $member_skier_date != 'Never Processed') {
-        $search_skier['criteria'][] = array( 'Account Last Modified Date', 'GREATER_THAN', $member_skier_date);
+        $time = strtotime($member_skier_date);
+        $newformat = date('Y-m-d',$time);
+        $search_skier['criteria'][] = array( 'Account Last Modified Date', 'GREATER_THAN', $newformat);
       }
 
       $search_season['criteria'][] = array( 'Account ID', 'NOT_BLANK', '');
 
       if(isset($_POST["reload"]) && $_POST["reload"] == 'false' && isset($member_season_date) && $member_season_date != 'Never Processed') {
-        $search_season['criteria'][] = array( 'Account Last Modified Date', 'GREATER_THAN', $member_season_date);
+        $time = strtotime($member_season_date);
+        $newformat = date('Y-m-d',$time);
+        $search_season['criteria'][] = array( 'Account Last Modified Date', 'GREATER_THAN', $newformat);
       }
     }
 
