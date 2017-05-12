@@ -225,7 +225,8 @@ function fetch_member_data() {
       // fetch by changes after the last pull
       // 2012-08-01
       if(isset($_POST["reload"]) && $_POST["reload"] == 'false' && isset($member_skier_date) && $member_skier_date != 'Never Processed') {
-        $time = strtotime('-1 day', $member_skier_date);
+        $time = strtotime($member_skier_date);
+        date_sub($time,date_interval_create_from_date_string("1 days"));
         $newformat = date('Y-m-d',$time);
         $search_skier['criteria'][] = array( 'Account Last Modified Date', 'GREATER_THAN', $newformat);
       }
@@ -233,7 +234,8 @@ function fetch_member_data() {
       $search_season['criteria'][] = array( 'Account ID', 'NOT_BLANK', '');
 
       if(isset($_POST["reload"]) && $_POST["reload"] == 'false' && isset($member_season_date) && $member_season_date != 'Never Processed') {
-        $time = strtotime('-1 day', $member_season_date);
+        $time = strtotime($member_season_date);
+        date_sub($time,date_interval_create_from_date_string("1 days"));
         $newformat = date('Y-m-d',$time);
         $search_season['criteria'][] = array( 'Account Last Modified Date', 'GREATER_THAN', $newformat);
       }
