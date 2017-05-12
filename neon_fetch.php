@@ -225,19 +225,17 @@ function fetch_member_data() {
       // fetch by changes after the last pull
       // 2012-08-01
       if(isset($_POST["reload"]) && $_POST["reload"] == 'false' && isset($member_skier_date) && $member_skier_date != 'Never Processed') {
-        $time = strtotime($member_skier_date);
-        date_sub($time,date_interval_create_from_date_string("1 days"));
-        $newformat = date('Y-m-d',$time);
-        $search_skier['criteria'][] = array( 'Account Last Modified Date', 'GREATER_THAN', $newformat);
+        $date = date_create($member_skier_date);
+        date_sub($date,date_interval_create_from_date_string("1 days"));
+        $search_skier['criteria'][] = array( 'Account Last Modified Date', 'GREATER_THAN', date_format($date, 'Y-m-d'));
       }
 
       $search_season['criteria'][] = array( 'Account ID', 'NOT_BLANK', '');
 
       if(isset($_POST["reload"]) && $_POST["reload"] == 'false' && isset($member_season_date) && $member_season_date != 'Never Processed') {
-        $time = strtotime($member_season_date);
-        date_sub($time,date_interval_create_from_date_string("1 days"));
-        $newformat = date('Y-m-d',$time);
-        $search_season['criteria'][] = array( 'Account Last Modified Date', 'GREATER_THAN', $newformat);
+        $date = date_create($member_skier_date);
+        date_sub($date,date_interval_create_from_date_string("1 days"));
+        $search_season['criteria'][] = array( 'Account Last Modified Date', 'GREATER_THAN', date_format($date, 'Y-m-d'));
       }
     }
 
@@ -258,7 +256,7 @@ function fetch_member_data() {
       $season_message = 'No season results were pulled from NEON';
       // Do one fetch as a sanity check.  Yes it's n+1 fetches. 
       if( isset($result_skier['page']['totalResults'] ) && $result_skier['page']['totalResults'] >= 1 ) {
-        for ($currentPage = 1; $currentPage < $result_skier['page']['totalPage']; $currentPage++) {
+        for ($currentPage = 1; $currentPage <= $result_skier['page']['totalPage']; $currentPage++) {
           # reload the search array's current_Page every time
           $search_skier['page']['currentPage'] = $currentPage;
           $result_skier = $neon->search($search_skier);
@@ -291,7 +289,7 @@ function fetch_member_data() {
       $result_season = $neon->search($search_season);
       // Do one fetch as a sanity check.  Yes it's n+1 fetches. 
       if( isset($result_season['page']['totalResults'] ) && $result_season['page']['totalResults'] >= 1 ) {
-        for ($currentPage = 1; $currentPage < $result_season['page']['totalPage']; $currentPage++) {
+        for ($currentPage = 1; $currentPage <= $result_season['page']['totalPage']; $currentPage++) {
           # reload the search array's current_Page every time
           $search_season['page']['currentPage'] = $currentPage;
           $result_season = $neon->search($search_season);
