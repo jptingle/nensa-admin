@@ -1,8 +1,23 @@
 <?php 
 
+// Set up logging using the WP_DEBUG feature - must be enabled
+// http://www.stumiller.me/sending-output-to-the-wordpress-debug-log/
+function nensa_admin_write_log ( $log )  {
+  if ( true === WP_DEBUG ) {
+    if ( is_array( $log ) || is_object( $log ) ) {
+      error_log( print_r( $log, true ) );
+    } else {
+      error_log( $log );
+    }
+  }
+}
+
 // Counts
 function load_member_season ($membership_row) {
   include ("connection.php");
+
+  nensa_admin_write_log( 'load_member_season fetch' );
+  nensa_admin_write_log( $membership_row );
 
   $now = time();
   $may_31 = strtotime("31st May");
@@ -74,7 +89,7 @@ function load_member_season ($membership_row) {
 
   //  The most likely failure is a duplicate entry with ussa_num
   if ($sql == 0) {
-    write_log($conn->error);
+    nensa_admin_write_log($conn->error);
     return 0;
   }
 
@@ -83,6 +98,9 @@ function load_member_season ($membership_row) {
 
 function load_member_skier ($membership_row) {
   include ("connection.php");
+
+  nensa_admin_write_log( 'load_member_skier fetch' );
+  nensa_admin_write_log( $membership_row );
 
   // Add to SQL statement NULLIF('$ussa_num',0) and remove
  
@@ -128,7 +146,7 @@ function load_member_skier ($membership_row) {
 
   //  The most likely failure is a duplicate entry with ussa_num
   if ($sql == 0) {
-    write_log($conn->error);
+    nensa_admin_write_log($conn->error);
     return 0;
   }
 
@@ -256,6 +274,8 @@ function fetch_member_data() {
       $season_message = 'No season results were pulled from NEON';
       // Do one fetch as a sanity check.  Yes it's n+1 fetches. 
       if( isset($result_skier['page']['totalResults'] ) && $result_skier['page']['totalResults'] >= 1 ) {
+        nensa_admin_write_log( 'member_skier NEON fetch record count' );
+        nensa_admin_write_log( $result_skier['page']['totalResults'] );
         for ($currentPage = 1; $currentPage <= $result_skier['page']['totalPage']; $currentPage++) {
           # reload the search array's current_Page every time
           $search_skier['page']['currentPage'] = $currentPage;
@@ -289,6 +309,8 @@ function fetch_member_data() {
       $result_season = $neon->search($search_season);
       // Do one fetch as a sanity check.  Yes it's n+1 fetches. 
       if( isset($result_season['page']['totalResults'] ) && $result_season['page']['totalResults'] >= 1 ) {
+        nensa_admin_write_log( 'member_season NEON fetch record count' );
+        nensa_admin_write_log( $result_skier['page']['totalResults'] );
         for ($currentPage = 1; $currentPage <= $result_season['page']['totalPage']; $currentPage++) {
           # reload the search array's current_Page every time
           $search_season['page']['currentPage'] = $currentPage;
