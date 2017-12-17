@@ -149,9 +149,7 @@ class nensa_admin {
         <ul>
   				<li><a href="#tabs-1"><?php _e('Member Lookup','nensa_admin'); ?></a></li>
   				<li><a href="#tabs-2"><?php _e('Load Results','nensa_admin'); ?></a></li>
-  				<li><a href="#tabs-3"><?php _e('Add Event','nensa_admin'); ?></a></li>
-  				<li><a href="#tabs-4"><?php _e('Add Race','nensa_admin'); ?></a></li>
-          <li><a href="#tabs-5"><?php _e('DataTable Reference','nensa_admin'); ?></a></li>
+          <li><a href="#tabs-3"><?php _e('DataTable Notes','nensa_admin'); ?></a></li>
         </ul>
           <div id="tabs-1">
           	<h1>NENSA Member Update From NEON</h1>
@@ -168,15 +166,20 @@ class nensa_admin {
 					  <hr>
           </div> <!-- End tab 1 -->
           <div id="tabs-2">
-          	</br><strong>Load Race Results</strong></br>
+          	<header>
+	          	<h1>Load Race Results</h1>
+	          </header>
 						<form action=# id="import" name="import" method="post" enctype="multipart/form-data", class="image-form" >
-							<table class="form-table"> 
-					      <tr valign="top"><th scope="row"><?php _e('Select Season:','nensa_admin'); ?></th>
+							<table class="form-table">
+					      <tr valign="top">
+					      	<th scope="row">
+					      		<?php _e('Select Season:','nensa_admin'); ?>
+					      	</th>
 					        <td>
 						          <select name="import_season" id="import_season" >
 						          	<?php
 						          	if(isset($_POST['import_season'])){
-						          		$seasons=array("2019","2018","2017");
+						          		$seasons=array("2020","2019","2018","2017","2016");
 						          		foreach ($seasons as $season) {
 														if($_POST['import_season']==$season) {
 															echo "<option selected value='$season'>$season</option>";	
@@ -185,6 +188,7 @@ class nensa_admin {
 														}
 													}
 												} else { 
+													echo "<option value=2020>2020</option>";
 							          	echo "<option value=2019>2019</option>";
 							          	echo "<option value=2018>2018</option>";
 							            echo "<option value=2017>2017</option>";
@@ -239,63 +243,9 @@ class nensa_admin {
 					  </form>
           </div> <!-- End tab 2 -->
           <div id="tabs-3">
-        		 <h1>Add Event</h1>
-						  </br>
-						  <form action=# method="POST" style="background-color: GAINSBORO;">
-						    <table class="form-table"> 
-						      <tr valign="top" name="Season"><th><?php _e('Select Season:','nensa_admin'); ?></th>
-						        <td>
-						          <select name="season" id="season" value=2017 >
-						            <option value=2017>2017</option>
-						            <option value=2016>2016</option>
-						            <option value=2015>2015</option>
-						            <option value=2014>2014</option>
-						          </select>
-						        </td>
-						      </tr>
-						      <tr valign="top"><th scope="row"><?php _e('Enter Event Name:','nensa_admin'); ?></th>
-						        <td>
-						          <input name="event_name" id="event_name" type="text">
-						        </td>
-						      </tr>
-						      <tr valign="top"><th scope="row"><?php _e('Select Date:','nensa_admin'); ?></th>
-						        <td>
-						          <input type="date" id="event_date" name="event_date" max="2020-12-31"><br>
-						        </td>
-						      </tr>
-						      <tr valign="top"><th scope="row"><?php _e('Enter Venue Name:','nensa_admin'); ?></th>
-						        <td>
-						          <input name="event_venue" id="event_venue" type="text">
-						        </td>
-						      </tr> 
-						      <tr valign="top"><th scope="row"><?php _e('Enter State:','nensa_admin'); ?></th>
-						        <td>
-						          <select name="event_state" id="event_state" value="NH">
-						            <option value="NH">MA</option>
-						            <option value="MA">NH</option>
-						            <option value="ME">ME</option>
-						            <option value="VT">VT</option>
-						            <option value="NY">NY</option>
-						          </select>
-						        </td>
-						      </tr> 
-						      <tr valign="top"><th scope="row"><?php _e('Enter Host Name:','nensa_admin'); ?></th>
-						        <td>
-						          <input name="event_host" id="event_host" type="text">
-						        </td>
-						      </tr>                                              
-						    </table>
-						      <p class="submit" style="padding-left: 12px;">
-						        <input id="import_race_results" type="submit" name="submit" class="button-primary" value="<?php _e('Create New Event', 'nensa_admin') ?>" />
-						      </p>
-						  </form>
-						  </br><p id="import_race_results_status"></p>
-						 <hr>
-          </div> <!-- End tab 3 -->
-          <div id="tabs-4">
-        		<?php	 create_race(); ?>
-          </div> <!-- End tab 4 -->
-          <div id="tabs-5">
+          	<header>
+          		<h2>Notes for NensaAdmin/DataTables Plugin(s) Integration</h1>
+          	</header>
             <ul>
                 <li>This plugin also contains shortcode wrappers that allow one to embedded wpDataTables in any page.</li>
                 <li>There are two shortcodes wrappers available.  One for the results based tables and another for the JN rankings.</li>
