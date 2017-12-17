@@ -38,20 +38,6 @@ class nensa_admin {
 			register_activation_hook( __FILE__ , array($this, 'nensa_admin_activate')); // Add settings on plugin activation
 		}
 
-		// Set up logging using the WP_DEBUG feature - must be enabled
-		// http://www.stumiller.me/sending-output-to-the-wordpress-debug-log/
-		if (!function_exists('write_log')) {
-		  function write_log ( $log )  {
-		    if ( true === WP_DEBUG ) {
-		      if ( is_array( $log ) || is_object( $log ) ) {
-		        error_log( print_r( $log, true ) );
-		      } else {
-		        error_log( $log );
-		      }
-		    }
-		  }
-		}
-
 	}
 	
   public function nensa_admin_plugins_loaded(){
@@ -87,7 +73,7 @@ class nensa_admin {
 		wp_enqueue_script( 'ajax-script', plugins_url( '/js/nensa_ajax.js', __FILE__ ), array('jquery') );
 		wp_enqueue_script( 'nensa_admin', plugins_url( '/js/admin_page.js', __FILE__ ), array('jquery') );  // Apply admin page scripts
 
-		wp_localize_script( 'nensa_admin', 'nensa_admin_pass_js_vars', array( 'ajax_image' => plugin_dir_url( __FILE__ ).'images/loading.gif', 'ajaxurl' => admin_url('admin-ajax.php') ) );
+		wp_localize_script( 'nensa_admin', 'nensa_admin_pass_js_vars', array( 'ajax_image' => plugin_dir_url( __FILE__ ).'images/loading.gif', 'ajaxurl' => admin_url('admin-ajax.php'), 'upload_url' => admin_url('async-upload.php'), 'nonce' => wp_create_nonce('media-form') ) );
 		//wp_localize_script( 'nensa_admin', 'wp_csv_to_db_pass_js_vars', array( 'ajax_image' => plugin_dir_url( __FILE__ ).'images/loading.gif', 'ajaxurl' => admin_url('admin-ajax.php') ) );
 	}
 	
@@ -142,6 +128,16 @@ class nensa_admin {
 			echo '<br /><em>('.__('click to dismiss','nensa_admin').')</em>';
 			echo '</div>';
 		}
+
+		// Could not get final import results submit working with ajax
+		// due to access to _FILE to doing an old fashion page load
+		$result_load_count = 0;
+		if(isset($_POST["import_season"]) && isset($_FILES["async-upload"])){
+			$file = $_FILES["async-upload"]["tmp_name"];
+			$event_name = $_POST["load_results_race_select"];
+			$result_load_count = load_race_data($event_name, $file);
+		}
+
 		?>
 		<div class="wrap">
         
@@ -172,59 +168,74 @@ class nensa_admin {
 					  <hr>
           </div> <!-- End tab 1 -->
           <div id="tabs-2">
-          	</br><strong>Load 2016/2017 Event Data</strong></br>
-						</br>
-
-						<form id="import" name="import" method="post" enctype="multipart/form-data">
+          	</br><strong>Load Race Results</strong></br>
+						<form action=# id="import" name="import" method="post" enctype="multipart/form-data", class="image-form" >
 							<table class="form-table"> 
 					      <tr valign="top"><th scope="row"><?php _e('Select Season:','nensa_admin'); ?></th>
 					        <td>
-						          <select name="import_season" id="import_season" value=2017 >
-						          	<option value=2020>2020</option>
-						          	<option value=2019>2019</option>
-						          	<option value=2018>2018</option>
-						            <option value=2017>2017</option>
-						            <option value=2016>2016</option>
-						            <option value=2015>2015</option>
-						            <option value=2014>2014</option>
+						          <select name="import_season" id="import_season" >
+						          	<?php
+						          	if(isset($_POST['import_season'])){
+						          		$seasons=array("2019","2018","2017");
+						          		foreach ($seasons as $season) {
+														if($_POST['import_season']==$season) {
+															echo "<option selected value='$season'>$season</option>";	
+														} else {
+															echo "<option value='$season'>$season</option>";
+														}
+													}
+												} else { 
+							          	echo "<option value=2019>2019</option>";
+							          	echo "<option value=2018>2018</option>";
+							            echo "<option value=2017>2017</option>";
+							            echo "<option value=2016>2016</option>";
+							          }
+						            ?>
 						          </select>
 								  </td>
 								</tr>
 								<tr valign="top"><th scope="row"><?php _e('Select Event:','nensa_admin'); ?></th>>
 									<td>
 										<select id="load_results_event_select" name="load_results_event_select" value="">
-											<option name="" value=""></option>
+								      <?php
+					          	if(isset($_POST['load_results_event_select'])){
+					          		$event=$_POST['load_results_event_select'];
+					          		echo "<option selected name='$event' value='$event'>$event</option>";
+											} else { 
+						            echo "<option name='' value=''></option>";
+						          }
+					            ?> 
 										</select>
 									</td>
 								</tr>
 								<tr valign="top"><th scope="row"><?php _e('Select Race:','nensa_admin'); ?></th>
 					        <td>
-								    <select id="event_select" name="event_select" value="">
-								        <option name="" value=""></option>
-								        
-								        <?php  // Get all db table names
-								        $sql = "SELECT  event_name  FROM RACE_EVENT WHERE season=2017 AND parent_event_id is null;";
-								        $results = $wpdb1->get_results($sql);
-								        $repop_table = isset($_POST['event_select']) ? $_POST['event_select'] : null;
-								        
-								        foreach($results as $index => $value) {
-								            foreach($value as $eventName) {
-								                ?><option name="<?php echo $eventName ?>" value="<?php echo $eventName ?>" <?php if($repop_table === $eventName) { echo 'selected="selected"'; } ?>><?php echo $eventName ?></option><?php
-								            }
-								        }
-								        ?>
+								    <select id="load_results_race_select" name="load_results_race_select" value="">
+								      <?php
+					          	if(isset($_POST['load_results_race_select'])){
+					          		$race=$_POST['load_results_race_select'];
+					          		echo "<option selected name='$race' value='$race'>$race</option>";
+											} else { 
+						            echo "<option name='' value=''></option>";
+						          }
+					            ?> 
 								    </select>
 								  </td>
 								</tr>
 								 <tr valign="top"><th scope="row"><?php _e('Select CSV File:','nensa_admin'); ?></th>
 								  <td>
-								  	<input id="results_file" type="file" name="file" />
+								  	<input id="results_file" type="file" name="async-upload" class="image-file" />
 								  </td>
 								</tr>
 							</table>
 							<p class="submit">
-						    <input id="import_button" type="submit" name="submit" class="button-primary" value="<?php _e('Import Event', 'nensa_admin') ?>" />
+						    <input id="import_race_results" type="submit" class="button-primary" value="<?php _e('Import Race', 'nensa_admin') ?>" />
 						  </p>
+						  <?php 
+						  if(isset($_POST['load_results_race_select'])){
+					      echo "$result_load_count results were loaded";
+							} 
+							?>
 					  </form>
           </div> <!-- End tab 2 -->
           <div id="tabs-3">
@@ -275,10 +286,10 @@ class nensa_admin {
 						      </tr>                                              
 						    </table>
 						      <p class="submit" style="padding-left: 12px;">
-						        <input id="event_button" type="submit" name="submit" class="button-primary" value="<?php _e('Create New Event', 'nensa_admin') ?>" />
+						        <input id="import_race_results" type="submit" name="submit" class="button-primary" value="<?php _e('Create New Event', 'nensa_admin') ?>" />
 						      </p>
 						  </form>
-						  </br>
+						  </br><p id="import_race_results_status"></p>
 						 <hr>
           </div> <!-- End tab 3 -->
           <div id="tabs-4">
@@ -338,7 +349,7 @@ function season_select() {
 	$results = $wpdb1->get_results($sql);
 	foreach($results as $index => $value) {
 		foreach($value as $eventName) {
-			$season = $season.",".$eventName;
+			$season = $season.";".$eventName;
 		}
 	}
 
@@ -347,3 +358,35 @@ function season_select() {
   echo $response;
 	wp_die();
 }
+
+add_action('wp_ajax_race_select','race_select');
+function race_select() {
+	global $wpdb1;
+	if(isset($_POST["action"]) && $_POST["action"] == 'race_select') {
+		$event_name = $_POST["event_name"];
+	} else {
+		wp_die();
+	}
+
+	$sql = "SELECT event_id FROM RACE_EVENT WHERE event_name='$event_name';";
+	$event_id = $wpdb1->get_var($sql);
+
+	if (is_null($event_id)) {
+		wp_die();
+	} 
+	
+	$sql = "SELECT  event_name  FROM RACE_EVENT WHERE parent_event_id='$event_id';";
+	$results = $wpdb1->get_results($sql);
+	foreach($results as $index => $value) {
+		foreach($value as $eventName) {
+			$event_list = $event_list.";".$eventName;
+		}
+	}
+
+	$response = json_encode( array( 'event_list' => $event_list ) );
+  header( "Content-Type: application/json" );
+  echo $response;
+	wp_die();
+}
+
+
