@@ -163,7 +163,7 @@ jQuery(document).ready(function($) {
 
 		// Run ajax request
 		$.post(nensa_admin_pass_js_vars.ajaxurl, data, function(response) {
-			var obj = response.season.split(",");
+			var obj = response.season.split(";");
 			var event_list = $.makeArray( obj );
 			$('#load_results_event_select option:gt(0)').remove();
 			$.each(event_list, function (index, value) {
