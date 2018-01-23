@@ -152,10 +152,21 @@ jQuery(document).ready(function($) {
 	});
 
 
-	$('#import_season').change(function() { 
-		import_season = $( "#import_season" ).val();
+	$('#import_season').click(function() { 
+		load_event_on_season_click_or_change ()
+	});
 
-				// Setup ajax variable
+	$('#import_season').change(function() { 
+		load_event_on_season_click_or_change ()
+	});
+
+	function load_event_on_season_click_or_change () {
+		import_season = $( "#import_season" ).val();
+		$('#load_results_event_select option:eq(0)').remove();
+		$('#load_results_event_select option:gt(0)').remove();
+		$('#load_results_race_select option:eq(0)').remove();
+		$('#load_results_race_select option:gt(0)').remove();
+		// Setup ajax variable
 		var data = {
 			action: 'season_select',
 			season: import_season
@@ -165,7 +176,6 @@ jQuery(document).ready(function($) {
 		$.post(nensa_admin_pass_js_vars.ajaxurl, data, function(response) {
 			var obj = response.season.split(";");
 			var event_list = $.makeArray( obj );
-			$('#load_results_event_select option:gt(0)').remove();
 			$.each(event_list, function (index, value) {
 			    $('#load_results_event_select').append($('<option/>', { 
 			        value: value,
@@ -174,21 +184,85 @@ jQuery(document).ready(function($) {
 			}); 
 
 		});
-	});
+	}
 
-	$('#event_button').click(function() { 
-		import_season = $( "#import_season" ).val();
+	$('#load_results_event_select').change(function() { 
+		event_name = $( "#load_results_event_select" ).val();
 
-				// Setup ajax variable
+		// Setup ajax variable
 		var data = {
-			action: 'fetch_member_data',
-			import_season: import_season
+			action: 'race_select',
+			event_name: event_name
 		};
 
 		// Run ajax request
-		//$.post(nensa_admin_pass_js_vars.ajaxurl, data, function(response) {
-			
-		//});
+		$.post(nensa_admin_pass_js_vars.ajaxurl, data, function(response) {
+			var obj = response.event_list.split(";");
+			var event_list = $.makeArray( obj );
+			$('#load_results_race_select option:eq(0)').remove();
+			$('#load_results_race_select option:gt(0)').remove();
+			$.each(event_list, function (index, value) {
+			    $('#load_results_race_select').append($('<option/>', { 
+			        value: value,
+			        text : value 
+			    }));
+			}); 
+
+		});
 	});
+
+	/*
+	$('#import_race_results').click(function() { 
+		results_file = $( "#results_file").val();
+		race_name = $( "#load_results_race_select" ).val();
+
+		var $imgForm    = $('.image-form');
+    var $imgFile    = $imgForm.find('.image-file');
+
+		 var formData = new FormData();
+
+    formData.append('action', 'upload-attachment');
+    formData.append('async-upload', $imgFile[0].files[0]);
+    formData.append('name', $imgFile[0].files[0].name);
+    var $test = $imgFile[0].files[0].name;
+    async_upload = $imgFile;
+    //formData.append('_wpnonce', su_config.nonce);
+		//upload();
+				// Setup ajax variable
+		var data = {
+			action: 'load_race_data',
+			async_upload: async_upload,
+			//,,,async_upload: $imgFile[0].files[0],
+			results_file: results_file,
+			race_name: race_name
+		};
+
+		// Run ajax request
+		$.post(nensa_admin_pass_js_vars.ajaxurl, data, function(response) {
+			$('#import_race_results_status').text('Hi there');
+		});
+	});
+
+	function upload(){
+	  var formData = new FormData();
+	  formData.append("action", "upload-attachment");
+		
+	  var fileInputElement = document.getElementById("results_file");
+	  formData.append("async-upload", fileInputElement.files[0]);
+	  formData.append("name", fileInputElement.files[0].name);
+	  	
+	  //also available on page from _wpPluploadSettings.defaults.multipart_params._wpnonce
+	  //<?php $my_nonce = wp_create_nonce('media-form'); ?>
+	  //formData.append("_wpnonce", "<?php echo $my_nonce; ?>");
+	  var xhr = new XMLHttpRequest();
+	  xhr.onreadystatechange=function(){
+	    if (xhr.readyState==4 && xhr.status==200){
+	      console.log(xhr.responseText);
+	    }
+	  }
+	  xhr.open("POST","/wp-admin/async-upload.php",true);
+	  xhr.send(formData);
+	}
+	*/
 
 });
